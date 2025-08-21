@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMI Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+    .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; margin-bottom: 20px; }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+    .inline-inputs { display: flex; gap: 10px; }
+    .inline-inputs div { flex: 1; }
+    button { margin-top: 15px; width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .result { margin-top: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>EMI Calculator</h2>
+
+    <label>Product Amount:</label>
+    <input type="number" id="product" placeholder="₹">
+
+    <label>Margin Money:</label>
+    <input type="number" id="margin" placeholder="₹">
+
+    <label>Processing Fee %:</label>
+    <input type="number" id="procFee" placeholder="%">
+
+    <label>Stamp Charges:</label>
+    <input type="number" id="stamp" placeholder="₹">
+
+    <label>Hypothecation Charges:</label>
+    <input type="number" id="hypo" placeholder="₹">
+
+    <div class="inline-inputs">
+      <div>
+        <label>Insurance Fixed:</label>
+        <input type="number" id="insFixed" placeholder="₹">
+      </div>
+      <div>
+        <label>Insurance %:</label>
+        <input type="number" id="insPercent" placeholder="%">
+      </div>
+    </div>
+
+    <label>Other Charges (per EMI):</label>
+    <input type="number" id="other" placeholder="₹">
+
+    <label>Company Interest Rate % (per year):</label>
+    <input type="number" id="rate" placeholder="%">
+
+    <label>Finance Period (Months):</label>
+    <input type="number" id="months" placeholder="Months">
+
+    <button onclick="calculateEMI()">Calculate</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function calculateEMI() {
+      const product = parseFloat(document.getElementById('product').value) || 0;
+      const margin = parseFloat(document.getElementById('margin').value) || 0;
+      const procFee = parseFloat(document.getElementById('procFee').value) || 0;
+      const stamp = parseFloat(document.getElementById('stamp').value) || 0;
+      const hypo = parseFloat(document.getElementById('hypo').value) || 0;
+      const insFixed = parseFloat(document.getElementById('insFixed').value) || 0;
+      const insPercent = parseFloat(document.getElementById('insPercent').value) || 0;
+      const other = parseFloat(document.getElementById('other').value) || 0;
+      const rate = parseFloat(document.getElementById('rate').value) || 0;
+      const months = parseFloat(document.getElementById('months').value) || 1;
+
+      const remaining = product - margin;
+
+      const procAmount = remaining * (procFee / 100);
+      const insurance = insFixed + (remaining * (insPercent / 100));
+      const downPayment = margin + procAmount + stamp + hypo + insurance;
+
+      const interest = remaining * (rate / 100) * (months / 12);
+
+      const repayable = remaining + interest;
+      const emi = (repayable / months) + other;
+
+      const totalViaEMIs = emi * months;
+      const totalPaid = downPayment + totalViaEMIs;
+      const extraCost = totalPaid - product;
+
+      document.getElementById('result').innerHTML = `
+        <b>Loan Amount (after Margin):</b> ₹${remaining.toFixed(2)}<br>
+        <b>Processing Fee:</b> ₹${procAmount.toFixed(2)}<br>
+        <b>Insurance:</b> ₹${insurance.toFixed(2)}<br>
+        <b>Total Down Payment:</b> ₹${downPayment.toFixed(2)}<br>
+        <b>Monthly EMI:</b> ₹${emi.toFixed(2)}<br>
+        <b>Total Interest:</b> ₹${interest.toFixed(2)}<br>
+        <b>Total via EMIs:</b> ₹${totalViaEMIs.toFixed(2)}<br>
+        <b>Total Payment (EMIs + Downpayment):</b> ₹${totalPaid.toFixed(2)}<br>
+        <b>Extra Cost to Customer (Interest + Charges):</b> ₹${extraCost.toFixed(2)}
+      `;
+    }
+  </script>
+</body>
+</html>
